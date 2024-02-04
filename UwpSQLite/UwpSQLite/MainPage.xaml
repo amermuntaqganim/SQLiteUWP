@@ -1,0 +1,26 @@
+﻿<Page
+    x:Class="UwpSQLite.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UwpSQLite"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+
+        <StackPanel Orientation="Horizontal">
+            <Button HorizontalAlignment="Left" Margin="100,10" Content="InsertUserData" Click="InsertButtonClick"></Button>
+            <Button HorizontalAlignment="Left" Margin="100,10" Content="UpdateUserData" Click="UpdateButtonClick"></Button>
+            <Button HorizontalAlignment="Left" Margin="100,10" Content="DeleteUserData" Click="DeleteButtonClick"></Button>
+        </StackPanel>
+
+       <!-- <Button Margin="50,50,0,0" Content="Insert" Click="InsertClick"></Button>-->
+       <!--#region 
+        <Button Margin="50,150,0,0" Content="Update" Click="UpdateClick"></Button>
+        <Button Margin="50,400,0,0" Content="Delete" Click="DeleteClick"></Button>
+        
+        --> 
+    </Grid>
+</Page>
