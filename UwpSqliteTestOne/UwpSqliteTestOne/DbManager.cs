@@ -60,21 +60,49 @@ namespace UwpSqliteTestOne
                                     Name TEXT,
                                     Description TEXT
                                 );";
+
  
                 tableCommand.ExecuteReader();
 
-               /* using (var cmd = connection.CreateCommand())
-                {
-                    Debug.WriteLine("Create Command");
-                    cmd.CommandText = @"CREATE TABLE IF NOT EXISTS Device (
-                                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    Name TEXT,
-                                    Description TEXT
-                                );";
-                    connection.Open();
-                    cmd.ExecuteNonQuery();
-                    connection.Close();
-                }*/
+
+                var createActionTableCommand = connection.CreateCommand();
+
+                createActionTableCommand.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS Action (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        DeviceId INTEGER,
+                        Name TEXT,
+                        FOREIGN KEY(DeviceId) REFERENCES Device(Id)
+                    );";
+
+
+                createActionTableCommand.ExecuteReader();
+
+
+                var createUrlTableCommand = connection.CreateCommand();
+                createUrlTableCommand.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS Url (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        ActionId INTEGER,
+                        Link TEXT,
+                        FOREIGN KEY(ActionId) REFERENCES Action(Id)
+                    );";
+
+
+                createUrlTableCommand.ExecuteReader();
+
+                /* using (var cmd = connection.CreateCommand())
+                 {
+                     Debug.WriteLine("Create Command");
+                     cmd.CommandText = @"CREATE TABLE IF NOT EXISTS Device (
+                                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                     Name TEXT,
+                                     Description TEXT
+                                 );";
+                     connection.Open();
+                     cmd.ExecuteNonQuery();
+                     connection.Close();
+                 }*/
             }
 
            /* await ApplicationData.Current.LocalFolder.CreateFileAsync("sqliteSample.db", CreationCollisionOption.OpenIfExists);

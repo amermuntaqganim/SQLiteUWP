@@ -43,6 +43,10 @@ namespace UwpSqliteTestOne
 
             await Task.Run(() =>
             {
+
+                List<DeviceAction> actions = new List<DeviceAction>();
+                List<DeviceUrl> urls = new List<DeviceUrl>();
+
                 for (int i = 0; i < 100; i++)
                 {
                     Device dev = new Device()
@@ -52,7 +56,25 @@ namespace UwpSqliteTestOne
                     };
 
                     DeviceDao.Instance.InsertData(dev);
+
+                    DeviceAction devaction = new DeviceAction()
+                    {
+                        DeviceId = i + 1,
+                        Name = "Action with hello " + i + 1
+                    };
+
+                    actions.Add(devaction);
+
+                    DeviceUrl deviceUrl = new DeviceUrl()
+                    {
+                        ActionId = i + 1,
+                        Link = "https//url/?/dfd"
+                    };
+                    urls.Add(deviceUrl);
                 }
+
+                DeviceDao.Instance.InsertActions(actions);
+                DeviceDao.Instance.InsertUrls(urls);
 
                 handler?.Invoke(sender, new EventArgs());
                 return Task.CompletedTask;
@@ -60,11 +82,22 @@ namespace UwpSqliteTestOne
 
             await Task.Run(() => {
 
-                var list = DeviceDao.Instance.GetData();
+                var list = DeviceDao.Instance.GetData().Result;
                 
                 foreach(var dev in list)
                 {
                     Debug.WriteLine(dev.Name + " " + dev.Description);
+                }
+            });
+
+
+            await Task.Run(() => {
+
+                var list = DeviceDao.Instance.GetUrlLinks().Result;
+
+                foreach (var url in list)
+                {
+                    Debug.WriteLine(url);
                 }
             });
 
@@ -73,7 +106,7 @@ namespace UwpSqliteTestOne
 
         private void OnUpdateDB(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Debug.WriteLine("Data Inserted");
         }
     }
 }

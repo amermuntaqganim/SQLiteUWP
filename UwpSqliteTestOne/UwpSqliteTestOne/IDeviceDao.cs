@@ -8,8 +8,14 @@ namespace UwpSqliteTestOne
 {
     public interface IDeviceDao
     {
-        void InsertData(Device device);
+        Task InsertData(Device device);
 
-        List<Device> GetData();
+        Task InsertActions(List<DeviceAction> devaction);
+
+        Task InsertUrls(List<DeviceUrl> devurls);
+
+        Task<List<Device>> GetData();
+
+        Task<List<string>> GetUrlLinks();
     }
 }
