@@ -25,9 +25,9 @@ namespace UwpSqliteTestOne
 
         public SqliteConnection GetConnection()
         {
-            if(connection!=null)
+/*            if(connection!=null)
                 return connection;
-            else
+            else*/
                 return connection = new SqliteConnection($"Filename={dbpath}");
             
         }
@@ -43,6 +43,7 @@ namespace UwpSqliteTestOne
 
             await ApplicationData.Current.LocalFolder.CreateFileAsync("sqliteSampleOne.db", CreationCollisionOption.OpenIfExists);
             dbpath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "sqliteSampleOne.db");
+            Debug.WriteLine(dbpath);
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
             {

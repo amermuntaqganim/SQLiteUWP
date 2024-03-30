@@ -41,11 +41,13 @@ namespace UwpSqliteTestOne
 
             await DbManager.Instance.InitializeDatabase();
 
-            await Task.Run(() =>
+            List<DeviceAction> actions = new List<DeviceAction>();
+            List<DeviceUrl> urls = new List<DeviceUrl>();
+
+            await Task.Run(async () =>
             {
 
-                List<DeviceAction> actions = new List<DeviceAction>();
-                List<DeviceUrl> urls = new List<DeviceUrl>();
+
 
                 for (int i = 0; i < 100; i++)
                 {
@@ -55,31 +57,50 @@ namespace UwpSqliteTestOne
                         Description = "World " + i
                     };
 
-                    DeviceDao.Instance.InsertData(dev);
+                    await DeviceDao.Instance.InsertData(dev);
 
-                    DeviceAction devaction = new DeviceAction()
+                    for (int j = 0; j < 10; j++)
                     {
-                        DeviceId = i + 1,
-                        Name = "Action with hello " + i + 1
-                    };
+                        DeviceAction devaction = new DeviceAction()
+                        {
+                            DeviceId = i + 1,
+                            Name = "Action with hello " + j + 1
+                        };
 
-                    actions.Add(devaction);
+                        actions.Add(devaction);
 
-                    DeviceUrl deviceUrl = new DeviceUrl()
-                    {
-                        ActionId = i + 1,
-                        Link = "https//url/?/dfd"
-                    };
-                    urls.Add(deviceUrl);
+                        for (int k = 0; k < 10; k++)
+                        {
+                            DeviceUrl deviceUrl = new DeviceUrl()
+                            {
+                                ActionId = j + 1,
+                                Link = k+"_"+"https//url/?/dfd"
+                            };
+                            urls.Add(deviceUrl);
+                        }
+                    }
+
+
+
                 }
 
-                DeviceDao.Instance.InsertActions(actions);
-                DeviceDao.Instance.InsertUrls(urls);
 
-                handler?.Invoke(sender, new EventArgs());
-                return Task.CompletedTask;
+
+               // handler?.Invoke(sender, new EventArgs());
+                
             });
 
+            await Task.Run(() => {
+                DeviceDao.Instance.InsertActions(actions);
+                
+            });
+
+            await Task.Run(() => {
+                 DeviceDao.Instance.InsertUrls(urls);
+
+            });
+
+            
             await Task.Run(() => {
 
                 var list = DeviceDao.Instance.GetData().Result;
@@ -93,7 +114,8 @@ namespace UwpSqliteTestOne
 
             await Task.Run(() => {
 
-                var list = DeviceDao.Instance.GetUrlLinks().Result;
+                //var list = DeviceDao.Instance.GetUrlLinks().Result;
+                var list = DeviceDao.Instance.GetUrlsForAction(5).Result;
 
                 foreach (var url in list)
                 {

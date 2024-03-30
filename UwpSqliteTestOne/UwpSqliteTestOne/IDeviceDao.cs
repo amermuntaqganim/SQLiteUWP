@@ -10,12 +10,13 @@ namespace UwpSqliteTestOne
     {
         Task InsertData(Device device);
 
-        Task InsertActions(List<DeviceAction> devaction);
+        void InsertActions(List<DeviceAction> devaction);
 
-        Task InsertUrls(List<DeviceUrl> devurls);
+        void InsertUrls(List<DeviceUrl> devurls);
 
         Task<List<Device>> GetData();
 
         Task<List<string>> GetUrlLinks();
+        Task<List<string>> GetUrlsForAction(int actionId);
     }
 }
