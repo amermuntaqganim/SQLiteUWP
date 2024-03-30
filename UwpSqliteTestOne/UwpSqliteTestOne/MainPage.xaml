@@ -9,7 +9,34 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
+            <Button
+    x:Name="CacheImagesButton"
+    Grid.Row="0"
+    Content="Cache Images"
+    HorizontalAlignment="Center"
+    Click="CacheImagesButton_Click"/>
+
+            <Button
+    x:Name="LoadCachedImagesButton"
+    Grid.Row="1"
+    Content="Load Cached Images"
+    HorizontalAlignment="Center"
+    Click="LoadCachedImagesButton_Click"/>
+
+            <Image
+    x:Name="ImageView"
+    Grid.Row="2"
+    Stretch="Uniform"
+    HorizontalAlignment="Center"
+    VerticalAlignment="Center"/>
+        </Grid>
         <Button Name ="Click" Content="Click Insert" Click="Button_Click" ></Button>
     </Grid>
 </Page>

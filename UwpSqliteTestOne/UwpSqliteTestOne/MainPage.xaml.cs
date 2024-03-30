@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -129,6 +130,40 @@ namespace UwpSqliteTestOne
         private void OnUpdateDB(object sender, EventArgs e)
         {
             Debug.WriteLine("Data Inserted");
+        }
+
+
+        private async void CacheImagesButton_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("Chace Images Button Clicked");
+
+            await DbManager.Instance.InitializeDatabase();
+
+            List<string> urls = new List<string>();
+            urls.Add("https://via.placeholder.com/150");
+            urls.Add("https://via.placeholder.com/200");
+            urls.Add("https://via.placeholder.com/300");
+
+            await ImageManager.Instance.DownloadAndSaveImages(urls);
+        }
+
+        private async void LoadCachedImagesButton_Click(object sender, RoutedEventArgs e)
+        {
+            byte[] imageData = await ImageManager.Instance.GetImageFromDatabase("https://via.placeholder.com/300");
+
+            if (imageData != null)
+            {
+                BitmapImage bitmapImage = new BitmapImage();
+                using (MemoryStream stream = new MemoryStream(imageData))
+                {
+                    _ = bitmapImage.SetSourceAsync(stream.AsRandomAccessStream());
+                }
+                ImageView.Source = bitmapImage;
+            }
+            else
+            {
+                // Handle case where image not found
+            }
         }
     }
 }

@@ -35,6 +35,7 @@ namespace UwpSqliteTestOne
         private DbManager()
         {
             Debug.WriteLine("Constructor called");
+            dbpath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "sqliteSampleOne.db");
         }
 
         public async Task InitializeDatabase()
@@ -92,36 +93,20 @@ namespace UwpSqliteTestOne
 
                 createUrlTableCommand.ExecuteReader();
 
-                /* using (var cmd = connection.CreateCommand())
-                 {
-                     Debug.WriteLine("Create Command");
-                     cmd.CommandText = @"CREATE TABLE IF NOT EXISTS Device (
-                                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                     Name TEXT,
-                                     Description TEXT
-                                 );";
-                     connection.Open();
-                     cmd.ExecuteNonQuery();
-                     connection.Close();
-                 }*/
+
+                var createImageTableCommand = connection.CreateCommand();
+                createImageTableCommand.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS Images (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Url TEXT,
+                        ImageData BLOB
+                    );";
+
+
+                createImageTableCommand.ExecuteReader();
+
             }
 
-           /* await ApplicationData.Current.LocalFolder.CreateFileAsync("sqliteSample.db", CreationCollisionOption.OpenIfExists);
-            string dbpath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "sqliteSample.db");
-            Debug.WriteLine(dbpath);
-            using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
-            {
-                db.Open();
-
-                String tableCommand = "CREATE TABLE IF NOT " +
-                    "EXISTS MyTable (Primary_Key INTEGER PRIMARY KEY, " +
-                    "Text_Entry NVARCHAR(2048) NULL)";
-
-                SqliteCommand createTable = new SqliteCommand(tableCommand, db);
-
-                createTable.ExecuteReader();
-            }*/
         }
 
         public void Open()
