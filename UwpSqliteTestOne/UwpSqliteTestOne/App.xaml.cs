@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -7,6 +8,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -30,6 +32,29 @@ namespace UwpSqliteTestOne
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            // Check if the app is being launched for the first time or after an update
+            /*bool isFirstLaunch = IsFirstLaunch();
+            if (isFirstLaunch)
+            {
+                
+                DeleteFile();
+            }*/
+
+
+            string dbFilePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "sqliteSampleOne.db");
+
+            
+            if (Debugger.IsAttached)
+            {
+                
+                if (File.Exists(dbFilePath))
+                {
+                    
+                    File.Delete(dbFilePath);
+                    Console.WriteLine("Existing database file deleted.");
+                }
+            }
         }
 
         /// <summary>
@@ -71,6 +96,9 @@ namespace UwpSqliteTestOne
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+
+
+            DbManager.Instance.InitializeDatabase();
         }
 
         /// <summary>
@@ -95,6 +123,43 @@ namespace UwpSqliteTestOne
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        private bool IsFirstLaunch()
+        {
+            var localSettings = ApplicationData.Current.LocalSettings;
+            var versionKey = "AppVersion";
+
+            // Check if the current version matches the stored version
+            if (localSettings.Values.ContainsKey(versionKey))
+            {
+                string storedVersion = localSettings.Values[versionKey].ToString();
+                string currentVersion = Package.Current.Id.Version.Major + "." + Package.Current.Id.Version.Minor;
+                return storedVersion != currentVersion;
+            }
+            else
+            {
+                // Store the current version for future checks
+                localSettings.Values[versionKey] = Package.Current.Id.Version.Major + "." + Package.Current.Id.Version.Minor;
+                return true;
+            }
+        }
+
+        private void DeleteFile()
+        {
+            
+            string fileName = Path.Combine(ApplicationData.Current.LocalFolder.Path, "sqliteSampleOne.db");
+
+            try
+            {
+                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                StorageFile file = localFolder.GetFileAsync(fileName).AsTask().Result;
+                file.DeleteAsync().AsTask().Wait();
+            }
+            catch (Exception ex)
+            {
+                
+            }
         }
     }
 }
