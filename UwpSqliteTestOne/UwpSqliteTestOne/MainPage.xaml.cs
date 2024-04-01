@@ -74,9 +74,12 @@ namespace UwpSqliteTestOne
                         {
                             DeviceUrl deviceUrl = new DeviceUrl()
                             {
-                                ActionId = j + 1,
-                                Link = k+"_"+"https//url/?/dfd"
+                                //ActionId = j + 1,
+                                // Link = k+"_"+"https//url/?/dfd"
+                                ActionId = j+1,
+                                Link = null
                             };
+                           
                             urls.Add(deviceUrl);
                         }
                     }
@@ -116,12 +119,15 @@ namespace UwpSqliteTestOne
             await Task.Run(() => {
 
                 //var list = DeviceDao.Instance.GetUrlLinks().Result;
-                var list = DeviceDao.Instance.GetUrlsForAction(5).Result;
 
+                var list = DeviceDao.Instance.GetUrlsForAction(5).Result;
                 foreach (var url in list)
                 {
                     Debug.WriteLine(url);
                 }
+
+
+
             });
 
             //DeviceDao.Instance.InsertData(new Device() { Name = "Hello", Description = "World" });

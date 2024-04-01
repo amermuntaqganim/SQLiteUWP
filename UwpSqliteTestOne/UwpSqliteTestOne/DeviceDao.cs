@@ -163,7 +163,7 @@ namespace UwpSqliteTestOne
   
         }*/
 
-        public void InsertUrls(List<DeviceUrl> devurls)
+        /*public void InsertUrls(List<DeviceUrl> devurls)
         {
             using (var connection = DbManager.Instance.GetConnection())
             {
@@ -208,8 +208,56 @@ namespace UwpSqliteTestOne
                     }
                 }
             }
+        }*/
+
+        public void InsertUrls(List<DeviceUrl> devurls)
+        {
+            using (var connection = DbManager.Instance.GetConnection())
+            {
+                connection.Open();
+
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Create command for inserting into Table1
+                        using (var command = connection.CreateCommand())
+                        {
+                            command.CommandText = @"REPLACE INTO Url (ActionId, Link) VALUES (@ActionId, @Link)";
+
+   
+
+                            // Execute the insert command for each data object
+                            foreach (var data in devurls)
+                            {
+                                command.Parameters.AddWithValue("@ActionId", data.ActionId);
+                                command.Parameters.AddWithValue("@Link", ConvertDbNull(data.Link));
+
+
+                                command.ExecuteNonQuery();
+                                command.Parameters.Clear();
+                            }
+                        }
+
+                        // Repeat the above process for other tables if necessary
+
+                        // Commit the transaction
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle exception
+                        transaction.Rollback();
+                        Console.WriteLine("Error: " + ex.Message);
+                    }
+                }
+            }
         }
 
+        private Object ConvertDbNull<T>(T origValue)
+        {
+            return (Object)origValue ?? System.DBNull.Value;
+        }
         public async Task<List<string>> GetUrlLinks()
         {
 
@@ -260,7 +308,10 @@ namespace UwpSqliteTestOne
                 {
                     while (await reader.ReadAsync())
                     {
-                        var url = reader.GetString(0);
+                        //var url = reader.GetString(0);
+
+                        string url = reader["Link"] != DBNull.Value ? reader["Link"].ToString() : null;
+
                         urls.Add(url);
                     }
                 }

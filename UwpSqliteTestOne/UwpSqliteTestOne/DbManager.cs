@@ -60,7 +60,10 @@ namespace UwpSqliteTestOne
                 tableCommand.CommandText = @"CREATE TABLE IF NOT EXISTS Device (
                                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     Name TEXT,
-                                    Description TEXT
+                                    Description TEXT,
+                                    Machine TEXT,
+                                    AGE  TEXT,
+                                    DATE TEXT
                                 );";
 
  
@@ -87,6 +90,8 @@ namespace UwpSqliteTestOne
                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
                         ActionId INTEGER,
                         Link TEXT,
+                        AGE TEXT,
+                        ULTRA TEXT,
                         FOREIGN KEY(ActionId) REFERENCES Action(Id)
                     );";
 
