@@ -22,6 +22,7 @@ namespace UwpRDBMS
         public string Data { get; set; }
         public string DeviceAttribute { get; set; }
         public string DeviceValue { get; set; }
+        public List<DeviceState> DeviceStatesList { get; set; } = new List<DeviceState>();
     }
 
     public class DeviceSettings
@@ -31,5 +32,12 @@ namespace UwpRDBMS
         public string SettingOrder { get; set; }
         public string CameraSetting { get; set; }
         public string ActionSetting { get; set; }
+    }
+
+    public class DeviceState
+    {
+        public int StateId { get; set; }
+        public string State { get; set; }
+        public DateTime Timestamp { get; set; }
     }
 }

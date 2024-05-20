@@ -43,10 +43,16 @@ namespace UwpRDBMS
             DeviceDao.Instance.InsertDeviceData("device-234", "Sample Data Three", "Sample data atrribute three", "sample value three");
             DeviceDao.Instance.InsertDeviceSettings("device-234", "Sample Settings Three");
 
-            DeviceDao.Instance.DeleteDevice("device-123");
+            //DeviceDao.Instance.DeleteDevice("device-123");
 
 
-            List<Device> devices = DeviceDao.Instance.GetDevicesWithData();
+            // For Nested Child
+
+            DeviceDao.Instance.InsertDeviceState("device-123", "New State", DateTime.Now);
+            DeviceDao.Instance.UpdateDeviceState("device-123", "Updated State", DateTime.Now);
+
+
+            List<Device> devices = DeviceDao.Instance.GetDevicesWithDataAndStates();
 
             // Example usage: Print the devices and their data
             foreach (var device in devices)
@@ -55,12 +61,18 @@ namespace UwpRDBMS
                 foreach (var data in device.DeviceDataList)
                 {
                     Debug.WriteLine($"\tData: {data.Data}, Additional Info: {data.DeviceAttribute}");
+
+                    foreach (var state in data.DeviceStatesList)
+                    {
+                        Debug.WriteLine($"\tState: {state.StateId}, Status: {state.State}, TimeStamp: { state.Timestamp }");
+                    }
                 }
                 foreach (var setting in device.DeviceSettingsList)
                 {
                     Debug.WriteLine($"\tSetting: {setting.Setting}");
                 }
             }
+
 
 
         }

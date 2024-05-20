@@ -243,5 +243,159 @@ namespace UwpRDBMS
             return new List<Device>(devices.Values);
         }
 
+        // Child of Child. Nested Child
+
+        public void InsertDeviceState(string deviceId, string state, DateTime timestamp)
+        {
+
+            using (var connection = DbManager.Instance.GetConnection())
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = @"
+                INSERT INTO DeviceStates (DataId, State, Timestamp)
+                SELECT dd.DataId, $state, $timestamp
+                FROM DeviceData dd
+                INNER JOIN Device d ON d.Id = dd.DeviceId
+                WHERE d.DeviceId = $deviceId;
+    ";
+                command.Parameters.AddWithValue("$deviceId", deviceId);
+                command.Parameters.AddWithValue("$state", state);
+                command.Parameters.AddWithValue("$timestamp", timestamp);
+                command.ExecuteNonQuery();
+
+
+            }
+
+        }
+
+        public void UpdateDeviceState(string deviceId, string state, DateTime timestamp)
+        {
+
+            using (var connection = DbManager.Instance.GetConnection())
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = @"
+                UPDATE DeviceStates
+                SET State = $state, Timestamp = $timestamp
+                WHERE DataId IN (
+                SELECT dd.DataId
+                FROM DeviceData dd
+                INNER JOIN Device d ON d.Id = dd.DeviceId
+                WHERE d.DeviceId = $deviceId
+        );
+    ";
+                command.Parameters.AddWithValue("$deviceId", deviceId);
+                command.Parameters.AddWithValue("$state", state);
+                command.Parameters.AddWithValue("$timestamp", timestamp);
+                command.ExecuteNonQuery();
+
+
+            }
+
+        }
+
+        public List<Device> GetDevicesWithDataAndStates()
+        {
+            var devices = new Dictionary<int, Device>();
+
+            using (var connection = DbManager.Instance.GetConnection())
+            {
+
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = @"
+                SELECT 
+                    d.Id, 
+                    d.DeviceId, 
+                    d.DeviceName,
+                    d.DeviceAction,
+                    dd.DataId, 
+                    dd.Data, 
+                    dd.DeviceAttribute,
+                    dd.DeviceValue,
+                    ds.SettingId, 
+                    ds.Setting,
+                    ds.SettingOrder,
+                    ds.CameraSetting,
+                    ds.ActionSetting,
+                    dst.StateId,
+                    dst.State,
+                    dst.Timestamp
+                FROM Device d
+                LEFT JOIN DeviceData dd ON d.Id = dd.DeviceId
+                LEFT JOIN DeviceSettings ds ON d.Id = ds.DeviceId
+                LEFT JOIN DeviceStates dst ON dd.DataId = dst.DataId;
+            ";
+
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int Id = reader.GetInt32(reader.GetOrdinal("Id"));
+                        Debug.WriteLine("Ganim: " + Id);
+
+                        if (!devices.TryGetValue(Id, out var device))
+                        {
+                            device = new Device
+                            {
+                                Id = Id,
+                                DeviceId = reader.GetString(reader.GetOrdinal("DeviceId")),
+                                DeviceAction = reader.IsDBNull(reader.GetOrdinal("DeviceAction")) ? null : reader.GetString(reader.GetOrdinal("DeviceAction")),
+                                DeviceName = reader.IsDBNull(reader.GetOrdinal("DeviceName")) ? null : reader.GetString(reader.GetOrdinal("DeviceName"))
+                            };
+                            devices[Id] = device;
+                        }
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("DataId")))
+                        {
+                            var deviceData = new DeviceData
+                            {
+                                DataId = reader.GetInt32(reader.GetOrdinal("DataId")),
+                                Data = reader.IsDBNull(reader.GetOrdinal("Data")) ? null : reader.GetString(reader.GetOrdinal("Data")),
+                                DeviceAttribute = reader.IsDBNull(reader.GetOrdinal("DeviceAttribute")) ? null : reader.GetString(reader.GetOrdinal("DeviceAttribute")),
+                                DeviceValue = reader.IsDBNull(reader.GetOrdinal("DeviceValue")) ? null : reader.GetString(reader.GetOrdinal("DeviceValue"))
+                            };
+                            device.DeviceDataList.Add(deviceData);
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("StateId")))
+                            {
+                                var deviceState = new DeviceState
+                                {
+                                    StateId = reader.GetInt32(reader.GetOrdinal("StateId")),
+                                    State = reader.GetString(reader.GetOrdinal("State")),
+                                    Timestamp = reader.GetDateTime(reader.GetOrdinal("Timestamp"))
+                                };
+                                deviceData.DeviceStatesList.Add(deviceState);
+                            }
+                        }
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("SettingId")))
+                        {
+                            var deviceSetting = new DeviceSettings
+                            {
+                                SettingId = reader.GetInt32(reader.GetOrdinal("SettingId")),
+                                Setting = reader.IsDBNull(reader.GetOrdinal("Setting")) ? null : reader.GetString(reader.GetOrdinal("Setting")),
+                                SettingOrder = reader.IsDBNull(reader.GetOrdinal("SettingOrder")) ? null : reader.GetString(reader.GetOrdinal("SettingOrder")),
+                                CameraSetting = reader.IsDBNull(reader.GetOrdinal("CameraSetting")) ? null : reader.GetString(reader.GetOrdinal("CameraSetting")),
+                                ActionSetting = reader.IsDBNull(reader.GetOrdinal("ActionSetting")) ? null : reader.GetString(reader.GetOrdinal("ActionSetting"))
+                            };
+                            device.DeviceSettingsList.Add(deviceSetting);
+                        }
+                    }
+                }
+            }
+
+
+
+
+            return new List<Device>(devices.Values);
+        }
+
     }
 }

@@ -70,6 +70,16 @@ namespace UwpRDBMS
                     ON DELETE CASCADE
                     ON UPDATE CASCADE
                 );
+
+                CREATE TABLE IF NOT EXISTS DeviceStates (
+                StateId INTEGER PRIMARY KEY AUTOINCREMENT,
+                DataId INTEGER NOT NULL,
+                State TEXT,
+                Timestamp DATETIME,
+                FOREIGN KEY (DataId) REFERENCES DeviceData(DataId)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
+            );
             ";
             command.ExecuteNonQuery();
         }
