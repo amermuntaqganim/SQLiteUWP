@@ -17,6 +17,7 @@ namespace UwpRDBMS
 
         public static DbManager Instance = Singleton<DbManager>.Instance;
         string dbpath;
+        string password;
         SqliteConnection connection;
 
         private DbManager()
@@ -27,14 +28,26 @@ namespace UwpRDBMS
 
         public SqliteConnection GetConnection() 
         {
+            dbpath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "SQLiteRDBMS.db");
+            password = "my_password";
 
-            return connection = new SqliteConnection($"Filename={dbpath}");
+            var connectionString = new SqliteConnectionStringBuilder
+            {
+                DataSource = dbpath,
+                Password = password,
+                Mode = SqliteOpenMode.ReadWriteCreate,
+                Cache = SqliteCacheMode.Default
+            }.ToString();
+
+            //return connection = new SqliteConnection($"Filename={dbpath}");
+            return connection = new SqliteConnection(connectionString);
 
         }
         public void CreateTables()
         {
 
-            var connection = new SqliteConnection($"Filename={dbpath}");
+            //var connection = new SqliteConnection($"Filename={dbpath}");
+            var connection = GetConnection();
             connection.Open();
             
 
